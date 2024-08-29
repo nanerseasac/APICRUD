@@ -4,6 +4,7 @@ import {
     userLogin
 } from './controllers/user.controller'
 import { verifyUserAccMiddleware } from './middleware/authenticator';
+import { addTask, completeTask, editTask } from './controllers/tasks.controller';
 
 // import {
 //   addProduct,
@@ -24,11 +25,17 @@ router.get('/', (req, res) => {
 });
 router.post('/register', addUser)
 // router.get('/produtos/:id', getById_validation, getProduct);
-router.get('/login', userLogin)
+router.post('/login', userLogin)
 
 router.use(verifyUserAccMiddleware)
-// router.post('/produtos', post_validation, addProduct);
 
+router.post('/tarefa', addTask)
+
+router.patch('/tarefa/:id/is_completed', completeTask)
+// router.post('/produtos', post_validation, addProduct);
+router.put('/tarefa/:id', editTask)
+
+router.delete('/tarefa/:id')
 // router.delete('/produtos/:id', deleteProduct);
 
 // router.put('/produtos/:id', updateProduct);

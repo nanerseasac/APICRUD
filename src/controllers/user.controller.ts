@@ -1,7 +1,7 @@
-import knex from "../dbKnex/connection"
+import knex from "../dbKnex/connection";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import { hashedPw } from "../hashedPw";
 
 export const addUser = async (req: Request, res: Response) => {
@@ -24,53 +24,49 @@ export const addUser = async (req: Request, res: Response) => {
 
 		const hashedPw = await bcrypt.hash(password, 10);
 
-		const user = await knex("users")
-			.insert({ email, password: hashedPw })
+		const user = await knex("users").insert({ email, password: hashedPw });
 
+		if (!user) {
+			return res.status(400).json("O usuário não foi cadastrado.");
+		}
 
-
-        if (!user) {
-            return res.status(400).json("O usuário não foi cadastrado.");
-        }
-
-        return res.status(201).json(user[0]);
+		return res.status(201).json({ message: "User Created" });
 	} catch (error) {
-        console.log(error)
-        throw new Error('Failed to register');
-    }
+		console.log(error);
+		throw new Error("Failed to register");
+	}
 };
 
 export const userLogin = async (req: Request, res: Response) => {
-    const { email, password} = req.body
+	const { email, password } = req.body;
 
-    if(!email || password ) {
-        return res.status(400).json("Os campos email e password são obrigatórios")
-    }
+	if (!email || !password) {
+		return res.status(400).json("Os campos email e password são obrigatórios");
+	}
 
-    try {
-        const user = await knex("users").where({ email })
+	try {
+		const user = await knex("users").where({ email });
 
-        if(!user) {
-            return res.status(404).json("Usuário não encontrado")
-        }
+		if (!user) {
+			return res.status(404).json("Usuário não encontrado");
+		}
 
-        const hashPass = await bcrypt.compare(password, user[0].password)
+		const hashPass = await bcrypt.compare(password, user[0].password);
 
-        if(!hashPass) {
-            return res.status(400).json("Email e senha não confere")
-        }
+		if (!hashPass) {
+			return res.status(400).json("Email e senha não confere");
+		}
 
-        const token = jwt.sign({ id: user[0].id }, hashedPw, { expiresIn: '8h' })
+		const token = jwt.sign({ id: user[0].id }, hashedPw, { expiresIn: "8h" });
 
-        const { password: _, ...userData } = user[0];
+		const { password: _, ...userData } = user[0];
 
-        return res.status(200).json({
-            user: userData,
-            token
-        });
-    } catch (error) {
-        console.log(error)
-        throw new Error('Failed to login');
-    }
-}
-
+		return res.status(200).json({
+			user: userData,
+			token,
+		});
+	} catch (error) {
+		console.log(error);
+		throw new Error("Failed to login");
+	}
+};
