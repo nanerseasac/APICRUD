@@ -1,1 +1,1 @@
-export const hashedPw = "iloveclau"
+export const hashedPw = "iloveclau";

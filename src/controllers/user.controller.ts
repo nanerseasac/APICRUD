@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { hashedPw } from "../hashedPw";
+import { addUser_Service } from "../services/user.services";
 
 export const addUser = async (req: Request, res: Response) => {
 	const { email, password } = req.body;
@@ -24,7 +25,7 @@ export const addUser = async (req: Request, res: Response) => {
 
 		const hashedPw = await bcrypt.hash(password, 10);
 
-		const user = await knex("users").insert({ email, password: hashedPw });
+		const user = await addUser_Service({ email, password: hashedPw})
 
 		if (!user) {
 			return res.status(400).json("O usuário não foi cadastrado.");

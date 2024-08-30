@@ -1,11 +1,13 @@
-
-import knex from "../dbKnex/connection"
-import jwt from "jsonwebtoken"
-import { Request, Response, NextFunction} from "express";
+import knex from "../dbKnex/connection";
+import jwt from "jsonwebtoken";
+import { Request, Response, NextFunction } from "express";
 import { hashedPw } from "../hashedPw";
 
-
-export const verifyUserAccMiddleware = async (req: Request, res:Response, next: NextFunction) => {
+export const verifyUserAccMiddleware = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	const { authorization } = req.headers;
 
 	if (!authorization) {
@@ -14,8 +16,8 @@ export const verifyUserAccMiddleware = async (req: Request, res:Response, next: 
 
 	try {
 		const token = authorization.replace("Bearer ", "").trim();
-    
-		const { id } = jwt.verify(token, hashedPw) as { id: number };;
+
+		const { id } = jwt.verify(token, hashedPw) as { id: number };
 
 		const queryKnex = await knex("users").where({ id }).first();
 
@@ -30,7 +32,6 @@ export const verifyUserAccMiddleware = async (req: Request, res:Response, next: 
 		next();
 	} catch (error) {
 		console.log(error);
-		throw new Error('Unauthorized');
+		throw new Error("Unauthorized");
 	}
 };
-
